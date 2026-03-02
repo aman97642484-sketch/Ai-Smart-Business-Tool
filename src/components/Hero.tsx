@@ -1,19 +1,19 @@
 import { useEffect, useRef, Suspense, lazy } from "react";
 import gsap from "gsap";
 
-const Spline = lazy(() => import("@splinetool/react-spline"));
+const HeroScene = lazy(() => import("@/components/HeroScene"));
 
 const Hero = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const subtextRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLButtonElement>(null);
-  const splineRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    tl.fromTo(splineRef.current, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.5 })
+    tl.fromTo(sceneRef.current, { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.5 })
       .fromTo(headlineRef.current, { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, "-=0.8")
       .fromTo(subtextRef.current, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, "-=0.5")
       .fromTo(ctaRef.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, "-=0.3");
@@ -34,17 +34,14 @@ const Hero = () => {
       }} />
 
       <div className="container mx-auto px-6 relative z-10 flex flex-col items-center text-center">
-        {/* Interactive Spline 3D element */}
-        <div ref={splineRef} className="mb-4 relative w-[280px] h-[280px] md:w-[380px] md:h-[380px]">
+        {/* Interactive 3D Scene */}
+        <div ref={sceneRef}>
           <Suspense fallback={
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="w-40 h-40 md:w-56 md:h-56 rounded-full animate-float relative">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/30 via-accent/20 to-transparent blur-sm" />
-                <div className="absolute inset-2 rounded-full bg-gradient-to-br from-primary/10 via-transparent to-accent/10 border border-primary/20" />
-              </div>
+            <div className="w-[300px] h-[300px] md:w-[420px] md:h-[420px] flex items-center justify-center">
+              <div className="w-40 h-40 rounded-full animate-float bg-gradient-to-br from-primary/20 via-accent/10 to-transparent blur-sm" />
             </div>
           }>
-            <Spline scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" />
+            <HeroScene />
           </Suspense>
         </div>
 
