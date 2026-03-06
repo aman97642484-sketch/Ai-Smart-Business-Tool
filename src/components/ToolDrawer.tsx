@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, Sparkles } from "lucide-react";
 import { Tool } from "@/data/tools";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ToolDrawerProps {
   open: boolean;
@@ -29,29 +30,23 @@ export default function ToolDrawer({ open, onClose, tool }: ToolDrawerProps) {
     setResult(null);
 
     try {
-      // Fallback: simulate structured result
-      await new Promise((r) => setTimeout(r, 2000));
-      const dataString = Object.entries(formData)
-        .map(([key, value]) => {
-          const field = tool?.fields?.find((f) => f.name === key);
-          return `${field?.label || key}: ${value}`;
-        })
-        .join("\n");
+      const prompt = buildPrompt();
+      const { data, error } = await supabase.functions.invoke('ai-analyze', {
+        body: { prompt },
+      });
 
-      setResult(
-        `📊 ${tool?.title} — AI Analysis\n\n` +
-        `Based on your inputs:\n${dataString}\n\n` +
-        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-        `📋 Key Findings:\n` +
-        `• Your data has been analyzed against current Indian tax laws and financial benchmarks.\n` +
-        `• Optimization opportunities have been identified based on your profile.\n\n` +
-        `💡 Recommendations:\n` +
-        `1. Review your current financial structure for optimization.\n` +
-        `2. Consider consulting a certified professional for personalized advice.\n` +
-        `3. Ensure compliance with all applicable regulations.\n\n` +
-        `⚠️ Disclaimer: This is AI-generated general guidance. Consult a qualified CA/advisor for specific decisions.\n\n` +
-        `⚡ Connect an AI API for real AI-powered analysis.`
-      );
+      if (error) {
+        throw new Error(error.message || 'Failed to get AI analysis');
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      setResult(data?.result || 'No result returned from AI.');
+    } catch (err: any) {
+      console.error('AI analysis error:', err);
+      setResult(`❌ Error: ${err.message || 'Something went wrong. Please try again.'}`);
     } finally {
       setLoading(false);
     }
