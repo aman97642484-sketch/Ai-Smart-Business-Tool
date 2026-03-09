@@ -14,7 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ai_tool_submissions: {
+        Row: {
+          ai_response: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          input_data: Json
+          tool_name: string
+        }
+        Insert: {
+          ai_response?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          input_data?: Json
+          tool_name: string
+        }
+        Update: {
+          ai_response?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          input_data?: Json
+          tool_name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
