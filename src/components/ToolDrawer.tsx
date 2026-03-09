@@ -38,7 +38,18 @@ export default function ToolDrawer({ open, onClose, tool }: ToolDrawerProps) {
 
       if (error) throw new Error(error.message || 'Failed to get AI analysis');
       if (data?.error) throw new Error(data.error);
-      setResult(data?.result || 'No result returned from AI.');
+      const aiResult = data?.result || 'No result returned from AI.';
+      setResult(aiResult);
+
+      // Save submission to database
+      const { _full_name, _email, ...toolInputs } = formData;
+      await supabase.from('ai_tool_submissions').insert({
+        full_name: _full_name,
+        email: _email,
+        tool_name: tool?.title || 'Unknown',
+        input_data: toolInputs,
+        ai_response: aiResult,
+      });
     } catch (err: any) {
       console.error('AI analysis error:', err);
       setResult(`❌ Error: ${err.message || 'Something went wrong. Please try again.'}`);
