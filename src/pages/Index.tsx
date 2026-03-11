@@ -13,7 +13,7 @@ const Index = () => {
       <footer className="relative py-12 border-t border-border">
         <div className="container mx-auto px-6 text-center">
           <p className="text-muted-foreground text-sm">
-            © 2026 Smart AI Business Tools. Built with AI-powered precision.
+             <a href="https://texmith.com/" target="_blank">Powered by - Texmith Infotech</a> | © 2026
           </p>
         </div>
       </footer>

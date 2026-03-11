@@ -32,16 +32,36 @@ export default function ToolDrawer({ open, onClose, tool }: ToolDrawerProps) {
 
     try {
       const prompt = buildPrompt();
-      const { data, error } = await supabase.functions.invoke('ai-analyze', {
+      const { data, error } = await supabase.functions.invoke("ai-analyze", {
         body: { prompt },
       });
 
-      if (error) throw new Error(error.message || 'Failed to get AI analysis');
+      if (error) throw new Error(error.message || "Failed to get AI analysis");
       if (data?.error) throw new Error(data.error);
-      setResult(data?.result || 'No result returned from AI.');
+
+      const aiResult = data?.result || "No result returned from AI.";
+      setResult(aiResult);
+
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+      await fetch(`${BACKEND_URL}/store-data.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData["_full_name"],
+          email: formData["_email"],
+          tool: tool?.title,
+          inputs: formData,
+          result: aiResult,
+        }),
+      });
     } catch (err: any) {
-      console.error('AI analysis error:', err);
-      setResult(`❌ Error: ${err.message || 'Something went wrong. Please try again.'}`);
+      console.error("AI analysis error:", err);
+      setResult(
+        `❌ Error: ${err.message || "Something went wrong. Please try again."}`,
+      );
     } finally {
       setLoading(false);
     }
@@ -80,7 +100,9 @@ export default function ToolDrawer({ open, onClose, tool }: ToolDrawerProps) {
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-glow-soft/[0.08] to-glow-purple/[0.08] flex items-center justify-center">
                     <tool.icon className="w-5 h-5 text-primary" />
                   </div>
-                  <h3 className="font-display text-xl font-semibold text-foreground">{tool.title}</h3>
+                  <h3 className="font-display text-xl font-semibold text-foreground">
+                    {tool.title}
+                  </h3>
                 </div>
                 <button
                   onClick={handleClose}
@@ -90,7 +112,9 @@ export default function ToolDrawer({ open, onClose, tool }: ToolDrawerProps) {
                 </button>
               </div>
 
-              <p className="text-muted-foreground text-sm mb-8">{tool.description}</p>
+              <p className="text-muted-foreground text-sm mb-8">
+                {tool.description}
+              </p>
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -104,11 +128,24 @@ export default function ToolDrawer({ open, onClose, tool }: ToolDrawerProps) {
                         required
                         className="w-full px-4 py-3 rounded-xl glass border-border text-foreground bg-surface-glass/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none"
                         value={formData[field.name] || ""}
-                        onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            [field.name]: e.target.value,
+                          })
+                        }
                       >
-                        <option value="" disabled>Select {field.label}</option>
+                        <option value="" disabled>
+                          Select {field.label}
+                        </option>
                         {field.options?.map((opt) => (
-                          <option key={opt} value={opt} className="bg-card text-foreground">{opt}</option>
+                          <option
+                            key={opt}
+                            value={opt}
+                            className="bg-card text-foreground"
+                          >
+                            {opt}
+                          </option>
                         ))}
                       </select>
                     ) : (
@@ -116,9 +153,17 @@ export default function ToolDrawer({ open, onClose, tool }: ToolDrawerProps) {
                         type={field.type}
                         required
                         className="w-full px-4 py-3 rounded-xl glass border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}`}
+                        placeholder={
+                          field.placeholder ||
+                          `Enter ${field.label.toLowerCase()}`
+                        }
                         value={formData[field.name] || ""}
-                        onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            [field.name]: e.target.value,
+                          })
+                        }
                       />
                     )}
                   </div>
@@ -140,7 +185,9 @@ export default function ToolDrawer({ open, onClose, tool }: ToolDrawerProps) {
                     className="w-full px-4 py-3 rounded-xl glass border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                     placeholder="Enter your full name"
                     value={formData["_full_name"] || ""}
-                    onChange={(e) => setFormData({ ...formData, _full_name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, _full_name: e.target.value })
+                    }
                   />
                 </div>
 
@@ -155,7 +202,9 @@ export default function ToolDrawer({ open, onClose, tool }: ToolDrawerProps) {
                     className="w-full px-4 py-3 rounded-xl glass border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                     placeholder="Enter your email address"
                     value={formData["_email"] || ""}
-                    onChange={(e) => setFormData({ ...formData, _email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, _email: e.target.value })
+                    }
                   />
                 </div>
 
@@ -188,7 +237,10 @@ export default function ToolDrawer({ open, onClose, tool }: ToolDrawerProps) {
                     exit={{ opacity: 0 }}
                   >
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="rounded-xl bg-white/5 p-5 animate-pulse">
+                      <div
+                        key={i}
+                        className="rounded-xl bg-white/5 p-5 animate-pulse"
+                      >
                         <div className="flex items-center gap-3 mb-3">
                           <div className="w-9 h-9 rounded-full bg-muted/30" />
                           <div className="h-4 w-40 rounded bg-muted/30" />
