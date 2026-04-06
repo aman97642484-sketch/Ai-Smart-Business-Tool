@@ -43,20 +43,30 @@ export default function ToolDrawer({ open, onClose, tool }: ToolDrawerProps) {
       setResult(aiResult);
 
       const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+      console.log("VITE_BACKEND_URL:", BACKEND_URL);
 
-      await fetch(`${BACKEND_URL}/store-data.php`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: formData["_full_name"],
-          email: formData["_email"],
-          tool: tool?.title,
-          inputs: formData,
-          result: aiResult,
-        }),
-      });
+      if (BACKEND_URL) {
+        try {
+          const res = await fetch(`${BACKEND_URL}/store-data.php`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: formData["_full_name"],
+              email: formData["_email"],
+              tool: tool?.title,
+              inputs: formData,
+              result: aiResult,
+            }),
+          });
+          console.log("Backend response status:", res.status);
+        } catch (backendErr) {
+          console.warn("Backend save failed (non-blocking):", backendErr);
+        }
+      } else {
+        console.warn("VITE_BACKEND_URL is not set — skipping backend save.");
+      }
     } catch (err: any) {
       console.error("AI analysis error:", err);
       setResult(
