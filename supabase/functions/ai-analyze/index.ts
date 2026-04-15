@@ -11,9 +11,9 @@ serve(async (req) => {
   }
 
   try {
-    const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
-    if (!GROQ_API_KEY) {
-      throw new Error('GROQ_API_KEY is not configured');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
     }
 
     const { prompt } = await req.json();
@@ -21,14 +21,14 @@ serve(async (req) => {
       throw new Error('Invalid prompt');
     }
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'openai/gpt-oss-120b',
+        model: 'google/gemini-2.5-flash',
         messages: [
           {
             role: 'system',
@@ -45,7 +45,7 @@ serve(async (req) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(`Groq API error [${response.status}]: ${JSON.stringify(data)}`);
+      throw new Error(`AI API error [${response.status}]: ${JSON.stringify(data)}`);
     }
 
     const result = data.choices?.[0]?.message?.content;
