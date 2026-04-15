@@ -3,10 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/Ai-business-tools/", // 👈 YE LINE ADD KARO
-
   server: {
     host: "::",
     port: 8080,
